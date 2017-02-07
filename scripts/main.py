@@ -30,30 +30,41 @@ def getCoords(line):
 
 
 def main():
-	infilename = sys.argv[1]                                 
-	
+	infilename1 = sys.argv[1]                               # obtaining the pdb file names for the protein(1) and dna(2)		  
+	infilename2 = sys.argv[2]
 	scriptPath = os.path.dirname(__file__)                 	# obtain directory name of current script in system
 	scriptPath = os.path.abspath(scriptPath)				# obtain full path to the above obtained directory name
 
 	try:
-		infilestream = open(infilename, 'rU')				# open input pdb file under try block to tackle exceptions
+		infilestream1 = open(infilename1, 'rU')				# open input pdb file under try block to tackle exceptions
+		infilestream2 = open(infilename2, 'rU')
 	except IOError:
 		print 'Error: Input PDB file was not found!'
 		return 0
 
-	outfilename = os.path.join(scriptPath, 'coords.tmp')	# create output coordinate file coords.tmp using absolute path
+	outfilename1 = os.path.join(scriptPath, 'coords1.tmp')	# create output coordinate file coords1.tmp and coords2.tmp using absolute path
+ 	outfilename2 = os.path.join(scriptPath, 'coords2.tmp')
  	try:
- 		outfilestream = open(outfilename, 'w')				# open the coordinate file under try block to handle exceptions
+ 		outfilestream1 = open(outfilename1, 'w')			# open the coordinate files under try block to handle exceptions
+		outfilestream2 = open(outfilename2, 'w')
 	except IOError:
 		print 'Error: Coordinate file could not be opened'
 		return 0
 
-	for line in infilestream.readlines():					# processing file line by line
+	for line in infilestream1.readlines():					# processing infilename1 line by line
 		if coordFind(line):									# check if line contains coordinates
-			(coordx, coordy, coordz) = getCoords(line)    			# obtain cordinates of the atom in line
-			outfilestream.write('{} {} {}\n'.format(coordx, coordy, coordz))			# write coordinates to output file
-	infilestream.close()
-	outfilestream.close()
+			(coordx, coordy, coordz) = getCoords(line)    	# obtain cordinates of the atom in line
+			outfilestream1.write('{} {} {}\n'.format(coordx, coordy, coordz))			# write coordinates to output file
+
+	for line in infilestream2.readlines():					# processing infilename2 line by line
+		if coordFind(line):									# check if line contains coordinates
+			(coordx, coordy, coordz) = getCoords(line)    	# obtain cordinates of the atom in line
+			outfilestream2.write('{} {} {}\n'.format(coordx, coordy, coordz))			# write coordinates to output file
+	
+	infilestream1.close()									# close all used file objects
+	infilestream2.close()
+	outfilestream1.close()
+	outfilestream2.close()
 
 
 # standard autocall construct for main()
