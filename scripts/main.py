@@ -28,7 +28,6 @@ def getCoords(line):
 	coordz = words[7]
 	return (coordx, coordy, coordz)
 
-
 def main():
 	infilename1 = sys.argv[1]                               # obtaining the pdb file names for the protein(1) and dna(2)		  
 	infilename2 = sys.argv[2]
