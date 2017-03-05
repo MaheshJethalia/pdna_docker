@@ -1,5 +1,5 @@
 #include <iostream>
-#include "./libs/header/molecule.h"
+#include "./libs/molecule.h"
 using namespace std;
 
 int main() {
