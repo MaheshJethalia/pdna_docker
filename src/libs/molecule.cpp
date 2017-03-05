@@ -1,6 +1,6 @@
 #include "molecule.h"
 #include <vector>
-
+#include <algorithm>
 using namespace std;
 
 
@@ -17,6 +17,34 @@ Molecule::Molecule() {
 
 
 int Molecule::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z) {
+	vector<int> vx, vy, vz;
+	float xc, yc, zc;
+	xc = yc = zc = 0.0;
+
+	for(int i = 0; i < X.size(); i++) {
+		xc += X[i]; yc += Y[i]; zc += Z[i];
+		vx.push_back((int) X[i]/resolution);
+		vy.push_back((int) Y[i]/resolution);
+		vz.push_back((int) Z[i]/resolution);
+	}	
+
+	xc /= X.size(); yc /= Y.size(); zc /= Z.size();
+
+	int xmin = min(0, min(vx.begin(), vx.end()));
+	int ymin = min(0, min(vy.begin(), vy.end()));
+	int zmin = min(0, min(vz.begin(), vz.end()));
+
+	xmin *= -1; ymin *= -1; zmin *= -1;
+
+	for(int i = 0; i < X.size(); i++) {
+		vx[i] += xmin; 
+		vy[i] += ymin;
+		vz[i] += zmin;
+	}
+
+	for(int i = 0; i < X.size(); i++) {
+		matrix[index(vx[i], vy[i], vz[i])] = 1;
+
     return 0;
 }
 
