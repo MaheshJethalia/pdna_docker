@@ -29,7 +29,10 @@ int Molecule::IsEmpty() {
 }
 
 int Molecule::GetVal(int x, int y, int z) {
-    return 0;
+	if((x < 0 || x > size) || (y < 0 || y > size) || (z < 0 || z > size))
+		return 0;
+	else 
+		return matrix[index(x, y, z)];
 }
 
 int index(int x, int y, int z) {
