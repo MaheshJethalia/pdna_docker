@@ -36,6 +36,8 @@ public:
 	int IsEmpty();
 	int GetVal(int x, int y, int z);
 	int CenterMatrix();
+	int CreateSurface();
+	int Rotate(int alpha, int beta, int gamma);
 };
 
 /*

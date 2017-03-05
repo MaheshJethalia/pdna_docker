@@ -15,39 +15,55 @@ Molecule::Molecule() {
     no_of_atoms = 0;
 }
 
-
 int Molecule::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z) {
-	vector<int> vx, vy, vz;
-	float xc, yc, zc;
+	vector<int> vx, vy, vz;		// integer form of matrices X, Y, Z
+	float xc, yc, zc;			// to hold index of geometric center of molecule
 	xc = yc = zc = 0.0;
 
-	for(int i = 0; i < X.size(); i++) {
-		xc += X[i]; yc += Y[i]; zc += Z[i];
+	for(int i = 0; i < X.size(); i++) {			// creating vx, vy, vz from X, Y, Z
+		xc += X[i]; yc += Y[i]; zc += Z[i];		// calculating sum of indices in each axis
 		vx.push_back((int) X[i]/resolution);
 		vy.push_back((int) Y[i]/resolution);
 		vz.push_back((int) Z[i]/resolution);
 	}	
 
-	xc /= X.size(); yc /= Y.size(); zc /= Z.size();
+	xc /= X.size(); yc /= Y.size(); zc /= Z.size();	// calculating avg of sum of indices = center
+	center_index = index((int)xc, (int)yc, (int)zc);// setting value of center_index
+	no_of_atoms = X.size();							// setting no_of_index
 
-	int xmin = min(0, min(vx.begin(), vx.end()));
-	int ymin = min(0, min(vy.begin(), vy.end()));
-	int zmin = min(0, min(vz.begin(), vz.end()));
+	int xmin = *min_element(vx.begin(), vx.end());	// calculating the minimum index to 
+	int ymin = *min_element(vy.begin(), vy.end());	// set all indices to positive by 
+	int zmin = *min_element(vz.begin(), vz.end());	// adding the offset
+	xmin = (xmin < 0) ? xmin : 0;
+	ymin = (ymin < 0) ? ymin : 0;
+	zmin = (zmin < 0) ? zmin : 0;
 
 	xmin *= -1; ymin *= -1; zmin *= -1;
 
-	for(int i = 0; i < X.size(); i++) {
+	for(int i = 0; i < X.size(); i++) {		// adding the offset index to all values in vx, vy , vz
 		vx[i] += xmin; 
 		vy[i] += ymin;
 		vz[i] += zmin;
 	}
 
-	for(int i = 0; i < X.size(); i++) {
-		matrix[index(vx[i], vy[i], vz[i])] = 1;
+	for(int i = 0; i < X.size(); i++) {		// Creating the basic matrix
+		matrix[index(vx[i], vy[i], vz[i])] = -10;	// -10 = value for core atom of protein
+	}
 
     return 0;
 }
 
+int Molecule::CenterMatrix() {
+	return 0;
+}
+
+int Molecule::CreateSurface() {
+	return 0;
+}
+
+int Molecule::Rotate(int alpha, int beta, int gamma) {
+	return 0;
+}
 
 int Molecule::IsEmpty() {
 	if(no_of_atoms == 0)
