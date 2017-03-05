@@ -35,6 +35,9 @@ public:
 	int CreateMatrix(std::vector<float>& X, std::vector<float>& Y, std::vector<float>& Z);
 	int IsEmpty();
 	int GetVal(int x, int y, int z);
+	int CenterMatrix();
+	int CreateSurface();
+	int Rotate(int alpha, int beta, int gamma);
 };
 
 /*
