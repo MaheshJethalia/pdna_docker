@@ -51,16 +51,40 @@ int Molecule::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z,
 		vy[i] += ymin;
 		vz[i] += zmin;
 	}
+    xbot = ybot = zbot = xtop = ytop = ztop = 0;
 
 	for(int i = 0; i < X.size(); i++) {		// Creating the basic matrix
-		matrix[index(vx[i], vy[i], vz[i])] = rho;	// -10 = value for core atom of protein
+		matrix[index(vx[i], vy[i], vz[i])] = rho;	// set value to rho supplied as a parameter
+        xtop = (xtop < vx[i]) ? vx[i] : xtop;
+        ytop = (ytop < vy[i]) ? vy[i] : ytop;
+        ztop = (ztop < vz[i]) ? vz[i] : ztop;
+        xbot = (xbot > vx[i]) ? vx[i] : xbot;
+        ybot = (ybot > vy[i]) ? vy[i] : ybot;
+        zbot = (zbot > vz[i]) ? vz[i] : zbot;
+
 	}
 
     return 0;
 }
 
-
+/* Function to shift the contents of the matrix of the molecule such that the geometric center
+ * lies at the center of the matrix -> Index(size/2, size/2, size/2)
+ */
 int Molecule::CenterMatrix() {
+    int xoff, yoff, zoff;
+    int zc = center_index % size;
+    int yc = (center_index/size) % size;
+    int xc = ((center_index/size)/size);
+    xoff = (size/2) - xc; yoff = (size/2) - yc; zoff = (size/2) - zc;
+    for(int x = xtop; x >= xbot; x--) {
+        for(int y = ytop; y >= ybot; y--) {
+            for(int z = ztop; z >= zbot; z--) {
+                matrix[Index(x + xoff, y + yoff, z + zoff)] = matrix[Index(x, y, z)];
+                matrix[Index(x, y, z)] = 0;
+            }
+        }
+    }
+
 	return 0;
 }
 

@@ -30,6 +30,7 @@ public:
 	std::vector<int> matrix;
 	int center_index;
     int no_of_atoms;
+    int xtop, ytop, ztop, xbot, ybot, zbot;
 
 	Molecule();
 
