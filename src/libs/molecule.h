@@ -21,7 +21,8 @@ extern float resolution;
 *	 Class: Molecule
 * 	 Structures: 
 *	 member variables: vector<int> matrix, int center_index, int no_of_atoms
-*	 member methods:	Molecule(), CreateMatrix(),	IsEmpty(), GetVal()
+*	 member methods:	Molecule(), CreateMatrix(),	IsEmpty(), GetVal(), CenterMatrix()
+*	 CreateSurface(), Rotate()
 */
 
 class Molecule{
@@ -29,10 +30,11 @@ public:
 	std::vector<int> matrix;
 	int center_index;
     int no_of_atoms;
+    int xtop, ytop, ztop, xbot, ybot, zbot;
 
 	Molecule();
 
-	int CreateMatrix(std::vector<float>& X, std::vector<float>& Y, std::vector<float>& Z);
+	int CreateMatrix(std::vector<float>& X, std::vector<float>& Y, std::vector<float>& Z, int rho);
 	int IsEmpty();
 	int GetVal(int x, int y, int z);
 	int CenterMatrix();
