@@ -79,8 +79,8 @@ int Molecule::CenterMatrix() {
     for(int x = xtop; x >= xbot; x--) {
         for(int y = ytop; y >= ybot; y--) {
             for(int z = ztop; z >= zbot; z--) {
-                matrix[Index(x + xoff, y + yoff, z + zoff)] = matrix[Index(x, y, z)];
-                matrix[Index(x, y, z)] = 0;
+                matrix[index(x + xoff, y + yoff, z + zoff)] = matrix[index(x, y, z)];
+                matrix[index(x, y, z)] = 0;
             }
         }
     }
