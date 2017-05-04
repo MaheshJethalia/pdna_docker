@@ -39,12 +39,11 @@ public:
 	int GetVal(int x, int y, int z);
 	int CenterMatrix();
 	int CreateSurface();
-	int Rotate(int alpha, int beta, int gamma);
 };
 
 /*
 *	Functions : index(x, y, z), 
 */
 int index(int x, int y, int z);
-
+int is_surface_element(int x, int y, int z, const Molecule* m);
 #endif
