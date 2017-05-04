@@ -9,6 +9,7 @@ using namespace std;
 *	NOTE: size is extern declared in molecule.h and defined in ../main.c
 */
 
+
 /* Class Molecule Constructor: creates a 3d matrix as per the value of size set in main.cpp
  * and intializes it with the value 0*/
 
@@ -16,6 +17,7 @@ Molecule::Molecule() {
 	matrix.resize(size * size * size, 0);
 	center_index = 0;
     no_of_atoms = 0;
+    xtop = xbot = ytop = ybot = ztop = zbot = 0;
 }
 
 /* Function to create a matrix of the macromolecule from the x, y and z xoordiantes 
@@ -84,15 +86,21 @@ int Molecule::CenterMatrix() {
             }
         }
     }
+    xbot += xoff; ybot += yoff; zbot += zoff;
+    xtop += xoff; ytop += yoff; ztop += zoff;
 
 	return 0;
 }
 
 int Molecule::CreateSurface() {
-	return 0;
-}
-
-int Molecule::Rotate(int alpha, int beta, int gamma) {
+    for(int x = xtop; x >= xbot; x--) {
+        for(int y = ytop; y >= ybot; y--) {
+            for(int z = ztop; z >= zbot; z--) {
+                if(is_surface_element(x, y, z, this))
+                    matrix[index(x, y, z)] = 1;
+            }
+        }
+    }
 	return 0;
 }
 
@@ -113,4 +121,21 @@ int Molecule::GetVal(int x, int y, int z) {
 int index(int x, int y, int z) {
 	return z + y * size + x * size * size;
 }
+
+int is_surface_element(int x, int y, int z, const Molecule* m) {
+    if(x == m->xtop || x == m->xbot || y == m->ytop || y == m->ybot || z == m->ztop || z == m->zbot)
+        return 1;
+    if((m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0)|| (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
+            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0))
+        return 1;
+    return 0;
+}
+
 
