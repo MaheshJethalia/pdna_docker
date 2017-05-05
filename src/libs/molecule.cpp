@@ -125,15 +125,15 @@ int index(int x, int y, int z) {
 int is_surface_element(int x, int y, int z, const Molecule* m) {
     if(x == m->xtop || x == m->xbot || y == m->ytop || y == m->ybot || z == m->ztop || z == m->zbot)
         return 1;
-    if((m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0)|| (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0) \
-            || (m->matrix[index(x, y, z)] == 0) || (m->matrix[index(x, y, z)] == 0))
+    if((m->matrix[index(x, y, z+1)] == 0) || (m->matrix[index(x, y+1, z+1)] == 0)|| (m->matrix[index(x+1, y, z+1)] == 0) \
+            || (m->matrix[index(x+1, y+1, z+1)] == 0) || (m->matrix[index(x, y-1, z+1)] == 0) || (m->matrix[index(x-1, y, z+1)] == 0) \
+            || (m->matrix[index(x-1, y-1, z+1)] == 0) || (m->matrix[index(x-1, y+1, z+1)] == 0) || (m->matrix[index(x+1, y-1, z+1)] == 0) \
+            || (m->matrix[index(x, y, z-1)] == 0) || (m->matrix[index(x, y+1, z-1)] == 0) || (m->matrix[index(x+1, y, z-1)] == 0) \
+            || (m->matrix[index(x+1, y+1, z-1)] == 0) || (m->matrix[index(x, y-1, z-1)] == 0) || (m->matrix[index(x-1, y, z-1)] == 0) \
+            || (m->matrix[index(x-1, y-1, z-1)] == 0) || (m->matrix[index(x-1, y+1, z-1)] == 0) || (m->matrix[index(x+1, y-1, z-1)] == 0) \
+            || (m->matrix[index(x, y+1, z)] == 0) || (m->matrix[index(x+1, y, z)] == 0) || (m->matrix[index(x+1, y+1, z)] == 0) \
+            || (m->matrix[index(x, y-1, z)] == 0) || (m->matrix[index(x-1, y, z)] == 0) || (m->matrix[index(x-1, y-1, z)] == 0) \
+            || (m->matrix[index(x-1, y+1, z)] == 0) || (m->matrix[index(x+1, y-1, z)] == 0))
         return 1;
     return 0;
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 
 # Main Python Program which will be called by the controlling bash script '/start.sh'
-# Inputs the PDB file name and location as a command line argument and creates another file 
+# Inputs the PDB file name and location as a command line argument and creates another file
 # where the processed data is stored
 
 # importing necessary modules
@@ -20,7 +20,7 @@ def coordFind(line):
 
 
 def getCoords(line):
-	"""Extracts and returns the coordinates of the atom / heteroatom in the line. This function assumes that the 
+	"""Extracts and returns the coordinates of the atom / heteroatom in the line. This function assumes that the
 	coordinates exist and have been checked for before (check coordFind())"""
 	words = line.split()
 	coordx = words[5]
@@ -29,7 +29,7 @@ def getCoords(line):
 	return (coordx, coordy, coordz)
 
 def main():
-	infilename1 = sys.argv[1]                               # obtaining the pdb file names for the protein(1) and dna(2)		  
+	infilename1 = sys.argv[1]                               # obtaining the pdb file names for the protein(1) and dna(2)
 	infilename2 = sys.argv[2]
 	scriptPath = os.path.dirname(__file__)                 	# obtain directory name of current script in system
 	scriptPath = os.path.abspath(scriptPath)				# obtain full path to the above obtained directory name
@@ -59,7 +59,7 @@ def main():
 		if coordFind(line):									# check if line contains coordinates
 			(coordx, coordy, coordz) = getCoords(line)    	# obtain cordinates of the atom in line
 			outfilestream2.write('{} {} {}\n'.format(coordx, coordy, coordz))			# write coordinates to output file
-	
+
 	infilestream1.close()									# close all used file objects
 	infilestream2.close()
 	outfilestream1.close()
