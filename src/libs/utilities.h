@@ -29,12 +29,13 @@ class Result {
  *  electrostatic_score(): obtain the ES score for the provided molecules
  *  vanderwaal_score(): obtain the VDWS score for the provided molecules
  *  scoring_function(): obtain the TS of the provided molecules
+ *  FFT(): calculates the Fourier operations on the molecules provided to it.
  */
 
 float geometric_complementarity(const Molecule* p, const Molecule* d);
 float electrostatic_score(const Molecule* p, const Molecule* d); 
 float vanderwaal_score(const Molecule* p, const Molecule* d); 
 float scoring_function(const Molecule* p, const Molecule* d); 
-
+float FFT(const Molecule* p, const Molecule* d);
 
 #endif
