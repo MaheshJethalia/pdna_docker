@@ -25,14 +25,14 @@ extern float resolution;
 *	 CreateSurface(), Rotate()
 */
 
-class Molecule{
+class GCMatrix{
 public:
 	std::vector<int> matrix;
 	int center_index;
     int no_of_atoms;
     int xtop, ytop, ztop, xbot, ybot, zbot;
 
-	Molecule();
+	GCMatrix();
 
 	int CreateMatrix(std::vector<float>& X, std::vector<float>& Y, std::vector<float>& Z, int rho);
 	int IsEmpty();
@@ -45,5 +45,5 @@ public:
 *	Functions : index(x, y, z), 
 */
 int index(int x, int y, int z);
-int is_surface_element(int x, int y, int z, const Molecule* m);
+int is_surface_element(int x, int y, int z, const GCMatrix* m);
 #endif

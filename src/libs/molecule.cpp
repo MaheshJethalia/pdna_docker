@@ -13,7 +13,7 @@ using namespace std;
 /* Class Molecule Constructor: creates a 3d matrix as per the value of size set in main.cpp
  * and intializes it with the value 0*/
 
-Molecule::Molecule() {
+GCMatrix::GCMatrix() {
 	matrix.resize(size * size * size, 0);
 	center_index = 0;
     no_of_atoms = 0;
@@ -23,12 +23,12 @@ Molecule::Molecule() {
 /* Function to create a matrix of the macromolecule from the x, y and z xoordiantes 
  * passed as floating vectors in the parameters*/
 
-int Molecule::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z, int rho) {
+int GCMatrix::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z, int rho) {
 	vector<int> vx, vy, vz;		// integer form of matrices X, Y, Z
 	float xc, yc, zc;			// to hold index of geometric center of molecule
 	xc = yc = zc = 0.0;
 
-	for(int i = 0; i < X.size(); i++) {			// creating vx, vy, vz from X, Y, Z
+	for(int i = 0; i < (int)X.size(); i++) {			// creating vx, vy, vz from X, Y, Z
 		xc += X[i]; yc += Y[i]; zc += Z[i];		// calculating sum of indices in each axis
 		vx.push_back((int) X[i]/resolution);
 		vy.push_back((int) Y[i]/resolution);
@@ -48,14 +48,14 @@ int Molecule::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z,
 
 	xmin *= -1; ymin *= -1; zmin *= -1;
 
-	for(int i = 0; i < X.size(); i++) {		// adding the offset index to all values in vx, vy , vz
+	for(int i = 0; i < (int)X.size(); i++) {		// adding the offset index to all values in vx, vy , vz
 		vx[i] += xmin; 
 		vy[i] += ymin;
 		vz[i] += zmin;
 	}
     xbot = ybot = zbot = xtop = ytop = ztop = 0;
 
-	for(int i = 0; i < X.size(); i++) {		// Creating the basic matrix
+	for(int i = 0; i < (int)X.size(); i++) {		// Creating the basic matrix
 		matrix[index(vx[i], vy[i], vz[i])] = rho;	// set value to rho supplied as a parameter
         xtop = (xtop < vx[i]) ? vx[i] : xtop;
         ytop = (ytop < vy[i]) ? vy[i] : ytop;
@@ -72,7 +72,7 @@ int Molecule::CreateMatrix(vector<float>& X, vector<float>& Y, vector<float>& Z,
 /* Function to shift the contents of the matrix of the molecule such that the geometric center
  * lies at the center of the matrix -> Index(size/2, size/2, size/2)
  */
-int Molecule::CenterMatrix() {
+int GCMatrix::CenterMatrix() {
     int xoff, yoff, zoff;
     int zc = center_index % size;
     int yc = (center_index/size) % size;
@@ -92,7 +92,7 @@ int Molecule::CenterMatrix() {
 	return 0;
 }
 
-int Molecule::CreateSurface() {
+int GCMatrix::CreateSurface() {
     for(int x = xtop; x >= xbot; x--) {
         for(int y = ytop; y >= ybot; y--) {
             for(int z = ztop; z >= zbot; z--) {
@@ -104,37 +104,36 @@ int Molecule::CreateSurface() {
 	return 0;
 }
 
-int Molecule::IsEmpty() {
+int GCMatrix::IsEmpty() {
 	if(no_of_atoms == 0)
 		return 1;
 	else
 		return 0;
 }
 
-int Molecule::GetVal(int x, int y, int z) {
+int GCMatrix::GetVal(int x, int y, int z) {
 	if((x < 0 || x > size) || (y < 0 || y > size) || (z < 0 || z > size))
 		return 0;
 	else 
-		return matrix[index(x, y, z)];
-}
+		return matrix[index(x, y, z)]; }
 
 int index(int x, int y, int z) {
 	return z + y * size + x * size * size;
 }
 
-int is_surface_element(int x, int y, int z, const Molecule* m) {
+int is_surface_element(int x, int y, int z, const GCMatrix* m) {
     if(x == m->xtop || x == m->xbot || y == m->ytop || y == m->ybot || z == m->ztop || z == m->zbot)
         return 1;
-    if((m->matrix[index(x, y, z+1)] == 0) || (m->matrix[index(x, y+1, z+1)] == 0)|| (m->matrix[index(x+1, y, z+1)] == 0) \
-            || (m->matrix[index(x+1, y+1, z+1)] == 0) || (m->matrix[index(x, y-1, z+1)] == 0) || (m->matrix[index(x-1, y, z+1)] == 0) \
-            || (m->matrix[index(x-1, y-1, z+1)] == 0) || (m->matrix[index(x-1, y+1, z+1)] == 0) || (m->matrix[index(x+1, y-1, z+1)] == 0) \
-            || (m->matrix[index(x, y, z-1)] == 0) || (m->matrix[index(x, y+1, z-1)] == 0) || (m->matrix[index(x+1, y, z-1)] == 0) \
-            || (m->matrix[index(x+1, y+1, z-1)] == 0) || (m->matrix[index(x, y-1, z-1)] == 0) || (m->matrix[index(x-1, y, z-1)] == 0) \
-            || (m->matrix[index(x-1, y-1, z-1)] == 0) || (m->matrix[index(x-1, y+1, z-1)] == 0) || (m->matrix[index(x+1, y-1, z-1)] == 0) \
-            || (m->matrix[index(x, y+1, z)] == 0) || (m->matrix[index(x+1, y, z)] == 0) || (m->matrix[index(x+1, y+1, z)] == 0) \
-            || (m->matrix[index(x, y-1, z)] == 0) || (m->matrix[index(x-1, y, z)] == 0) || (m->matrix[index(x-1, y-1, z)] == 0) \
-            || (m->matrix[index(x-1, y+1, z)] == 0) || (m->matrix[index(x+1, y-1, z)] == 0))
-        return 1;
+    for(int i = -1; i <= 1; i++){
+        for(int j = -1; j<= 1; j++) {
+            for(int k = -1; k <= 1; k++) {
+                if(i==0 && j==0 && k==0)
+                    continue;
+                else if(m->matrix[index(x+i, y+j, z+k)] == 0)
+                    return 1;
+            }
+        }
+    }
     return 0;
 }
 
