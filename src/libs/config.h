@@ -1,1 +1,6 @@
-//Nothing config.c result.h result.c
+#ifndef CONFIG_H
+#define CONFIG_H
+
+
+
+#endif

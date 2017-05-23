@@ -1,1 +1,3 @@
-//Nothing result.c
+#ifndef RESULT_H
+#define RESULT_H
+#endif

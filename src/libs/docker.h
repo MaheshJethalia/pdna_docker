@@ -1,1 +1,3 @@
-//Nothing docker.c config.h config.c result.h result.c
+#ifndef DOCKER_H
+#define DOCKER_H
+#endif
