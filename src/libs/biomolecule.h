@@ -1,7 +1,7 @@
 #ifndef BIOMOLECULE_H
 #define BIOMOLECULE_H
-
 #include "utility.h"
+
 /*
  * enum biomolecule_type => assign molecule types as either:
  *  Proteins => PRO     Deoxyribonucleic acid => DNA
@@ -29,8 +29,10 @@ typedef struct biomolecule {
     int no_atoms;
 } biomolecule;
 
+// Read info from file pointed to by fp into bm
 void create_biomolecule(biomolecule* bm, char* fp);
 
+// Convert all coordinates of bm to positive values
 void process_coordinates(biomolecule* bm);
 
 #endif
