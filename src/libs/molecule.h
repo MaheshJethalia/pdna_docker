@@ -13,7 +13,7 @@ class Coordinate {
 
         Coordinate();
         Coordinate(int, int, int);
-        Coordinate Rotate(RotationalAngle&);
+        Coordinate Rotate(RotationalAngle&, Coordinate center);
 };
 
 class Atom {
