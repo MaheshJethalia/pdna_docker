@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-enum biomol_type { NDEF, PRO, DNA };
-enum molecule_type { NDEF, C, N};
+enum biomol_type { PRO, DNA };
+enum atom_type { C, N};
 
 class Coordinate {
     public:
@@ -20,10 +20,10 @@ class Coordinate {
 class Atom {
     public:
         Coordinate coord;
-        molecule_type moltype;
+        atom_type type;
 
         Atom();
-        Atom(Coordinate&, molecule_type moltype);
+        Atom(Coordinate, atom_type t);
 };
 
 class Biomolecule {
@@ -31,6 +31,9 @@ class Biomolecule {
         int noatoms;
         biomol_type type;
         std::vector<Atom> atoms;
+        Coordinate center;
 
+        Biomolecule();
+        Biomolecule(std::string, biomol_type t);
 };
 #endif
