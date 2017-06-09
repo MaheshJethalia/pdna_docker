@@ -5,33 +5,35 @@
 #include <string>
 #include <vector>
 
-enum biomol_type { PRO, DNA };
+enum biomol_type { NDEF, PRO, DNA };
+enum molecule_type { NDEF, C, N};
 
 class Coordinate {
     public:
-        int x, y, z;
+        float x, y, z;
 
         Coordinate();
-        Coordinate(int, int, int);
+        Coordinate(float, float, float);
         Coordinate Rotate(RotationalAngle&, Coordinate center);
 };
 
 class Atom {
     public:
         Coordinate coord;
-        biomol_type type;
-        std::string name;
+        molecule_type moltype;
 
         Atom();
-        Atom(Coordinate&, biomol_type, std::string&);
+        Atom(Coordinate&, molecule_type moltype);
 };
 
 class Biomolecule {
     public:
         int noatoms;
         biomol_type type;
-        Atom* atoms;
-        std::string PDB;
+        std::vector<Atom> atoms;
+
+        Biomolecule();
+        Biomolecule(std::string filename);
 };
 
 #endif

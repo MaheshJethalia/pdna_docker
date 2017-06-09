@@ -8,4 +8,7 @@ class RotationalAngle {
         RotationalAngle(int, int, int);
 };
 
+class Configuration {
+    RotationalAngle angle;
+};
 #endif
