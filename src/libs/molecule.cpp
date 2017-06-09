@@ -1,11 +1,10 @@
 #include "molecule.h"
 #include <cmath>
 #include <fstream>
-
 using namespace std;
 
 /*
- * Default constructor for class Coordinate
+* Default constructor for class Coordinate
  */
 Coordinate::Coordinate() {
     x = 0; y = 0; z = 0;    //sets x, y, z coordinates to 0 by default
@@ -80,6 +79,7 @@ Biomolecule::Biomolecule(string filename) {
     fin >> noatoms;
     float tx, ty, tz;
     Atom temp_atom;
+
     for(int i = 0; i < noatoms; i++){
         fin >> tx >> ty >> tz;
         temp_atom.coord.x = tx; temp_atom.coord.y = ty; temp_atom.coord.z = tz;

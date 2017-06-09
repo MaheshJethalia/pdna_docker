@@ -32,8 +32,5 @@ class Biomolecule {
         biomol_type type;
         std::vector<Atom> atoms;
 
-        Biomolecule();
-        Biomolecule(std::string filename);
 };
-
 #endif
