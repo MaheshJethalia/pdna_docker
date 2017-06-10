@@ -13,8 +13,8 @@ class Coordinate {
         float x, y, z;
 
         Coordinate();
-        Coordinate(float, float, float);
-        Coordinate Rotate(RotationalAngle&, Coordinate center);
+        Coordinate(const float, const float, const float);
+        Coordinate Rotate(RotationalAngle&, const Coordinate center);
 };
 
 class Atom {
@@ -23,7 +23,7 @@ class Atom {
         atom_type type;
 
         Atom();
-        Atom(Coordinate, atom_type t);
+        Atom( const Coordinate c ,const  atom_type t);
 };
 
 class Biomolecule {
@@ -34,6 +34,7 @@ class Biomolecule {
         Coordinate center;
 
         Biomolecule();
-        Biomolecule(std::string, biomol_type t);
+        Biomolecule(const std::string, const biomol_type t);
+        void FilterCoordinates();
 };
 #endif
