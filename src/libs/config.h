@@ -3,20 +3,19 @@
 #include <vector>
 #include "molecule.h"
 
-struct intCoordinate { int x; int y; int z;};
 
 class RotationalAngle {
     public:
         int alpha, beta, gamma;
         RotationalAngle();
-        RotationalAngle(int, int, int);
+        RotationalAngle(const int, const int, const int);
 };
 
 class Configuration {
     public:
         int noatoms;
         RotationalAngle angle;
-        std::vector<intCoordinate> icoords;       
+        std::vector<Coordinate> coords;       
         std::vector<atom_type> atom_types;
 
         Configuration();

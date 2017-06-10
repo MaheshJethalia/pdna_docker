@@ -1,4 +1,5 @@
 #include "molecule.h"
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 using namespace std;
@@ -15,7 +16,7 @@ Coordinate::Coordinate() {
  * Coordinate(xx, yy, zz) : sets the value of objects x, y and  coordinates to xx, yy, zz supplied
  * as parameters
  */
-Coordinate::Coordinate(float tx, float ty, float tz){
+Coordinate::Coordinate(const float tx, const float ty, const float tz){
     x = tx; y = ty; z = tz;
 }
 
@@ -56,8 +57,8 @@ Atom::Atom(){
  * Parameterised constructor for class Atom:
  * Atom(Coordinate& c, molecule_type m) => sets the value of the coord of the atom to c and moltype to m
 */
-Atom::Atom(const Coordinate c, molecule_type m){
-    coord = c; moltype = m;
+Atom::Atom(const Coordinate c, const atom_type m){
+    coord = c; type = m;
 }
 
 /*
@@ -72,7 +73,7 @@ Biomolecule::Biomolecule(){
  * Biomolecule(string filename)=> reads the data from the filename and stores the coordinates from the same
  * in atoms[]
  */
-Biomolecule::Biomolecule(string filename, biomol_type t) {
+Biomolecule::Biomolecule(const string filename, const biomol_type t) {
     ifstream fin(filename);                 // opens input filestream to read in data
     fin >> noatoms;                         // input the number of atoms in the molecule
     Atom temp_atom;                         // temporary atom to store the contents of the current data being read
@@ -82,4 +83,31 @@ Biomolecule::Biomolecule(string filename, biomol_type t) {
     }
     fin.close();                            // close the file stream 
     type = t;
+}
+
+/*
+ * Function to change the coordinates of the atoms in the biomolecule such that all coordinates are non-negative
+ * and also calculates the coordinates the geometric center of the molecule about which all rotations will occur
+ * while generating different configurations of the biomolecule during docking
+ */
+void Biomolecule::FilterCoordinates(){
+    float xmin, ymin, zmin, xavg, yavg, zavg;       // local vars declared
+    xmin = ymin = zmin = xavg = yavg = zavg=  0.0;  // local vars initialized 
+
+    for(vector<Atom>::iterator it = atoms.begin(); it != atoms.end(); it++) {    //iterate through vector of atoms
+           xmin = min(xmin, it->coord.x);           // search for the most negative x, y and z coord 
+           ymin = min(ymin, it->coord.y);
+           zmin = min(zmin, it->coord.z);
+           xavg += it->coord.x;                     // calculate sum for finding average of coords
+           yavg += it->coord.y;
+           zavg += it->coord.z;
+    }
+    for(vector<Atom>::iterator it = atoms.begin(); it != atoms.end(); it++) {       // iterate again
+        it->coord.x += -1.0 * xmin;                 // translate all coords to make them positive
+        it->coord.y += -1.0 * ymin;
+        it->coord.z += -1.0 * zmin;
+    }
+
+    xavg /= noatoms; yavg /= noatoms; zavg /= noatoms;  // calculate the average of all coords to obtain the 
+    center = Coordinate(xavg, yavg, zavg);              // coords of geometric center
 }
