@@ -48,12 +48,17 @@ typedef struct Matrix {
 
 } Matrix;
 
-typedef struct Result {
+typedef struct Decoy {
     Coordinate protein_translation;
     Coordinate dna_translation;
     AngleOfRotation protein_rotation;
     AngleOfRotation dna_rotation;
     float total_score;
+} Decoy;
+
+typedef struct Result {
+    Decoy* decoys;
+    int number_of_results;
 } Result;
 
 extern int generate_trig_tables();
@@ -86,5 +91,6 @@ extern void create_geometric_surface(Matrix* matrix);
 
 extern int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack);
 
-extern void insert_favourable_decoys_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle, Coordinate protein_center);
+extern void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle, Coordinate protein_center);
+
 #endif

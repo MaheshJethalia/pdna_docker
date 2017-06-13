@@ -61,9 +61,15 @@ int create_configuration(Configuration* config, const AngleOfRotation tangle, Bi
     if((config = (Configuration*)malloc(sizeof(Configuration))) == NULL) {
         MEMORY_ERROR;
         printf("\nFunction: create_configuration | docker.c | 60");
+
+        // Cleaning up function heap allocations:
+        free(config);
+
+        // Return status flag
         flag = 0; return flag;
     }
 
+    // If allocations are fine, continue creating the configuration
     config->parent = tparent;
     config->angle = tangle;
     config->number_of_atoms = tparent->number_of_atoms;
@@ -73,6 +79,10 @@ int create_configuration(Configuration* config, const AngleOfRotation tangle, Bi
     if((config->atoms = (Atom*)malloc(sizeof(Atom) * config->number_of_atoms)) == NULL){
         MEMORY_ERROR;
         printf("\nFunction: create_configuration | docker.c | 72");
+
+        // cleaning up function heap allocations
+        free(config);
+        
         return 0;
     }
     

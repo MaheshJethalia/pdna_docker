@@ -2,14 +2,28 @@
 
 int generate_trig_tables(){
     int flag = 1;
-    float* sin_table; float* cos_table;
-    if(((sin_table = (float*)malloc(360 / ROTATION_STEP)) != NULL) && ((cos_table = (float*)malloc(360 / ROTATION_STEP)) != NULL)) {
+    float* sin_table; float* cos_table;     // extern defined pointers
+    sin_table = cos_table = NULL;
+
+    // Allocate memory to sin_table and cos_table and handle error
+    if(((sin_table = (float*)malloc(sizeof(float) * 360 / ROTATION_STEP)) != NULL) && ((cos_table = (float*)malloc(sizeof(float) * 360 / ROTATION_STEP)) != NULL)) {
+
+        // Fill up cos and sin tables with the necessary values
         for(int i = 0; i < 360; i += ROTATION_STEP) {
             sin_table[i / ROTATION_STEP] = (float) sin((float)i);
             cos_table[i / ROTATION_STEP] = (float) cos((float)i);
         }
     }
-    else flag = 0;
+    // If there was a memory error
+    else { 
+        flag = 0;  // set status flag to error (0)
+        MEMORY_ERROR;
+        printf("Function: generate_trig_tables | preprocessing.c | 9\n");
+        
+        // clean up function heap allocation
+        free(sin_table);
+        free(cos_table) ;
+    }
     return flag;
 }
 
@@ -48,11 +62,11 @@ Atom create_atom(const int tx, const int ty, const int tz, const AtomType ttype)
     return atom;
 }
 
-int read_pdb_to_biomolecule(const char* filename, Biomolecule* m){
+int read_pdb_to_biomolecule(const char* filename, Biomolecule* m) {
 
     // Local variable declarations
-    FILE* fptr;
-    int flag = 1;
+    FILE* fptr;         // file pointer to read in pdb data
+    int flag = 1;       // status flag
     float x, y, z;
     int t;
     int i;
@@ -70,6 +84,10 @@ int read_pdb_to_biomolecule(const char* filename, Biomolecule* m){
         flag = -1;
         FILE_ERROR;
         printf("Function: read_pdb_to_biomolecule | preprocessing.c | 67\n");
+
+        // cleaning up function heap allocations
+        free(m);
+
         return flag;
     }
 
@@ -79,6 +97,12 @@ int read_pdb_to_biomolecule(const char* filename, Biomolecule* m){
         flag = 0;
         MEMORY_ERROR;
         printf("Function: read_pdb_to_biomolecule | preprocessing.c | 76\n");
+
+        // cleaning up function heap allocations
+        free(m->atoms);
+        free(m);
+        fclose(fptr);
+
         return flag;
     }
 
@@ -87,10 +111,11 @@ int read_pdb_to_biomolecule(const char* filename, Biomolecule* m){
         fscanf(fptr, "%f %f %f %d", &x, &y, &z, &t);
         m->atoms[i] = create_atom(x, y, z, (AtomType)t);
     }
-    m->center = create_coordinate(0,0,0);
-    m->max = create_coordinate(0,0,0);
-    m->min = create_coordinate(0,0,0);
+
+    m->center = create_coordinate(0,0,0);   // Initialize m->center to (0, 0, 0)
     fclose(fptr) ;
+
+    // return status flag
     return flag;
 }
 
@@ -128,7 +153,7 @@ void filter_coordinates_of_biomolecule(Biomolecule* m) {
 
 
 void center_coordinates_of_biomolecule(Biomolecule* m) {
-    // Local varaible declarations (calculate the shift in coordinates needed)
+    // Local variable declarations (calculate the shift in coordinates needed)
     Coordinate grid_center = create_coordinate(GRID_SIZE * RESOLUTION / 2.0 , GRID_SIZE * RESOLUTION /2.0, GRID_SIZE *RESOLUTION / 2.0);
     Coordinate shift = create_coordinate(grid_center.x - m->center.x, grid_center.y - m->center.y, grid_center.z - m->center.z);
     int i;
