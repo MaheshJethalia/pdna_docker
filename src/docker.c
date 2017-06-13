@@ -84,27 +84,12 @@ int create_configuration(Configuration* config, const AngleOfRotation tangle, Bi
     return flag;
 }
 
-Matrix* create_geometric_core(Configuration* config) {
+void create_geometric_core(Configuration* config, Matrix* tmp, int init_value) {
     // Local variable declaration
-    Matrix* tmp; 
     int i, j, k;
 
-    // Allocating memory to tmp and handling memory errors
-    if((tmp = (Matrix*)malloc(sizeof(Matrix))) == NULL) {
-        MEMORY_ERROR;
-        printf("Function: create_geometric_core | docker.c | 93");
-        return NULL;
-    }
-
-    // If no error, now allocate memory to tmp->values and handle memory errors
     tmp->parent_config = config;
-    if((tmp->value = (double*)malloc(sizeof(double) * GRID_SIZE * GRID_SIZE * GRID_SIZE)) == NULL) {
-        MEMORY_ERROR;
-        printf("Function: create_geometric_core | docker.c | 101");
-        return tmp;
-    }
-
-    // All okay! Initialize tmp->val, then create the biomolecule core matrix
+    // Initialize tmp->val, then create the biomolecule core matrix
     for(i = 0; i < GRID_SIZE; i++) {
         for(j = 0; j < GRID_SIZE; j++) {
             for(k = 0; k < GRID_SIZE; k++) {
@@ -118,7 +103,7 @@ Matrix* create_geometric_core(Configuration* config) {
         int tx = (int) tmp->parent_config->atoms[i].coordinate.x / RESOLUTION;
         int ty = (int) tmp->parent_config->atoms[i].coordinate.y / RESOLUTION;
         int tz = (int) tmp->parent_config->atoms[i].coordinate.z / RESOLUTION;
-        tmp->value[index(tx, ty, tz)] = RHO;        // Setting all core locations to RHO
+        tmp->value[index(tx, ty, tz)] = init_value;        // Setting all core locations to RHO
         tmp->xmax = max(tmp->xmax, tx);             // Finding the bounds for core locations 
         tmp->ymax = max(tmp->ymax, ty);             // in the matrix value
         tmp->zmax = max(tmp->zmax, tz);             // for quicker lookup in the future
@@ -127,7 +112,7 @@ Matrix* create_geometric_core(Configuration* config) {
         tmp->zmin = min(tmp->zmin, tz);
     }
 
-    return tmp;
+    
 }
 
 void create_geometric_surface(Matrix* matrix) {

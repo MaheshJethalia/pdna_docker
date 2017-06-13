@@ -48,6 +48,14 @@ typedef struct Matrix {
 
 } Matrix;
 
+typedef struct Result {
+    Coordinate protein_translation;
+    Coordinate dna_translation;
+    AngleOfRotation protein_rotation;
+    AngleOfRotation dna_rotation;
+    float total_score;
+} Result;
+
 extern int generate_trig_tables();
 
 extern Coordinate create_coordinate(const float tx, const float ty, const float tz);
@@ -72,12 +80,11 @@ extern int write_configuration_to_pdb(const char* filename, Configuration* m);
 
 extern int create_configuration(Configuration* config, const AngleOfRotation tangle, Biomolecule* tparent);
 
-extern Matrix* create_geometric_core(Configuration* config);
+extern void create_geometric_core(Configuration* config, Matrix* tmp, int init_value);
 
 extern void create_geometric_surface(Matrix* matrix);
 
-extern double* get_correlation_function(double* a, double* b);
+extern int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack);
 
-extern void dock_configurations(Configuration* p, Configuration* d);
-
+extern void insert_favourable_decoys_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle, Coordinate protein_center);
 #endif
