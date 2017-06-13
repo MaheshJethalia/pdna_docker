@@ -1,5 +1,31 @@
 #include "docker.h"
 
+void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle, Coordinate protein_center) {
+    // Assumes that all memory allocations have already been taken care of
+    
+    // Local variable declarations
+    int i; Decoy d;
+    d.protein_rotation = create_angle_of_rotation(0, 0, 0);
+    d.protein_translation = protein_center;
+    d.dna_rotation = current_angle;
+    i = 0;
+
+    // Initialize d t
+    d.dna_translation = create_coordinate(((i / GRID_SIZE) / GRID_SIZE) % GRID_SIZE, (i / GRID_SIZE) % GRID_SIZE, i % GRID_SIZE);
+    d.total_score = geometric_correlation_function[i];
+
+    // Search for sharpest peak value
+    for(i = 1; i < GRID_SIZE * GRID_SIZE * GRID_SIZE; i++ ) {
+        if(geometric_correlation_function[i] > d.total_score) {
+            d.total_score = geometric_correlation_function[i];
+            d.dna_translation = create_coordinate(((i / GRID_SIZE) / GRID_SIZE) % GRID_SIZE, (i / GRID_SIZE) % GRID_SIZE, i % GRID_SIZE);
+        }
+    }
+
+    // d stores details of sharpest peak | Insert peak in result stack
+    result_stack->decoys[result_stack->number_of_results] = d;
+    result_stack->number_of_results += 1;
+}
  
 int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
     // Declaring local variables here
@@ -14,45 +40,84 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
     if((protein_space_matrix = (Matrix*) malloc (sizeof(Matrix))) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.h | 14");
+
+        // nothing to clean in function heap here
         return 0;
     }
 
     if((dna_space_matrix = (Matrix*) malloc(sizeof(Matrix))) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.h | 20");
+
+        // cleaning up function heap allocations
+        free(protein_space_matrix);
+
         return 0;
     }
-
-
 
     // Allocate memory to arrays to be transformed and handle errors
     if((protein_space_matrix->value = (double*) fftw_malloc (sizeof(double) * GRID_SIZE *GRID_SIZE *GRID_SIZE)) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.c | 26");
+
+        //cleaning up function memory allocations
+        free(protein_space_matrix);
+        free(dna_space_matrix);
+
         return 0;
     }
 
     if((dna_space_matrix->value = (double*) fftw_malloc(sizeof(double) * GRID_SIZE * GRID_SIZE * GRID_SIZE)) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.c | 32");
+
+        // cleaning up function heap allocations
+        free(protein_space_matrix->value);
+        free(protein_space_matrix);
+        free(dna_space_matrix);
+        
         return 0;
     }
 
     if((geometric_correlation_function = (double*) fftw_malloc(sizeof(double) * GRID_SIZE * GRID_SIZE * GRID_SIZE)) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.c | 38");
+
+        // cleaning up function heap allocations
+        free(dna_space_matrix->value);
+        free(protein_space_matrix->value);
+        free(dna_space_matrix);
+        free(protein_space_matrix);
+
         return 0;
     }
 
     if((protein_space_matrix_transform = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex) * GRID_SIZE * GRID_SIZE * (GRID_SIZE / 2 + 1))) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.c | 44");
+
+        // cleaning up function heap allocations
+        free(dna_space_matrix->value);
+        free(protein_space_matrix->value);
+        free(dna_space_matrix);
+        free(protein_space_matrix);
+        free(geometric_correlation_function);
+
         return 0;
     }
 
     if((dna_space_matrix_transform = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex) * GRID_SIZE * GRID_SIZE * (GRID_SIZE / 2 + 1))) == NULL) {
         MEMORY_ERROR;
         printf("Function: get_geometric_complementarity_score | scoring.c | 50");
+
+        // cleaning up function heap allocation
+        free(dna_space_matrix->value);
+        free(protein_space_matrix->value);
+        free(dna_space_matrix);
+        free(protein_space_matrix);
+        free(geometric_correlation_function);
+        free(protein_space_matrix_transform);
+
         return 0;
     }
 
@@ -68,6 +133,17 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
     protein = dna = NULL;
     if(create_configuration(protein, create_angle_of_rotation(0, 0, 0), P) == 0) {
         // create_configuration returned an error. Clean up and exit. 
+        
+        // cleaning up function heap allocation
+        free(dna_space_matrix->value);
+        free(protein_space_matrix->value);
+        free(dna_space_matrix);
+        free(protein_space_matrix);
+        free(geometric_correlation_function);
+        free(protein_space_matrix_transform);
+        free(dna_space_matrix_transform);
+
+        return 0;
     }
 
     // Creating the space discretized matrix
@@ -89,6 +165,14 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
                 // Create dna configuration wrt new rotational angle current_angle
                 if(create_configuration(dna, current_angle, D) == 0) {
                     // create_configuration returned error. Clean up and exit.
+                    free(dna_space_matrix->value);
+                    free(protein_space_matrix->value);
+                    free(dna_space_matrix);
+                    free(protein_space_matrix);
+                    free(geometric_correlation_function);
+                    free(protein_space_matrix_transform);
+                    free(dna_space_matrix_transform);
+
                     return 0;
                 }
 
@@ -115,7 +199,7 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
                 fftw_execute(ifft_plan);
 
                 // Need to extract highest correlation translations and store in Result stack
-                insert_favourable_decoys_in_result_stack(result_stack, geometric_correlation_function, current_angle, protein->center);
+                insert_favourable_decoy_in_result_stack(result_stack, geometric_correlation_function, current_angle, protein->center);
                 
                 
                 current_angle.gamma += ROTATION_STEP;
@@ -128,7 +212,14 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
 
     /********** All iterations completed. Result Stack stores best geometric complementarity scores achieved ********/
 
-    // Cleaning up the heap 
+    // cleaning up function heap allocation
+    free(dna_space_matrix->value);
+    free(protein_space_matrix->value);
+    free(dna_space_matrix);
+    free(protein_space_matrix);
+    free(geometric_correlation_function);
+    free(protein_space_matrix_transform);
+    free(dna_space_matrix_transform);
 
     return 1;
 }
