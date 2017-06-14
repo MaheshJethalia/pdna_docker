@@ -49,9 +49,7 @@ typedef struct Matrix {
 } Matrix;
 
 typedef struct Decoy {
-    Coordinate protein_translation;
     Coordinate dna_translation;
-    AngleOfRotation protein_rotation;
     AngleOfRotation dna_rotation;
     float total_score;
 } Decoy;
@@ -91,6 +89,7 @@ extern void create_geometric_surface(Matrix* matrix);
 
 extern int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack);
 
-extern void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle, Coordinate protein_center);
+extern void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle);
 
+extern int write_result_to_file(const char* filename, Result* result_stack);
 #endif

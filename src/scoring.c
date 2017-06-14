@@ -1,24 +1,22 @@
 #include "docker.h"
 
-void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle, Coordinate protein_center) {
+void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle ) {
     // Assumes that all memory allocations have already been taken care of
     
     // Local variable declarations
     int i; Decoy d;
-    d.protein_rotation = create_angle_of_rotation(0, 0, 0);
-    d.protein_translation = protein_center;
     d.dna_rotation = current_angle;
     i = 0;
 
-    // Initialize d t
-    d.dna_translation = create_coordinate(((i / GRID_SIZE) / GRID_SIZE) % GRID_SIZE, (i / GRID_SIZE) % GRID_SIZE, i % GRID_SIZE);
-    d.total_score = geometric_correlation_function[i];
+    // Initialize d with data of geometric_correlation_function[0]
+    d.dna_translation = create_coordinate(0.0, 0.0, 0.0);
+    d.total_score = geometric_correlation_function[0];
 
     // Search for sharpest peak value
     for(i = 1; i < GRID_SIZE * GRID_SIZE * GRID_SIZE; i++ ) {
         if(geometric_correlation_function[i] > d.total_score) {
             d.total_score = geometric_correlation_function[i];
-            d.dna_translation = create_coordinate(((i / GRID_SIZE) / GRID_SIZE) % GRID_SIZE, (i / GRID_SIZE) % GRID_SIZE, i % GRID_SIZE);
+            d.dna_translation = create_coordinate(RESOLUTION * (((i / GRID_SIZE) / GRID_SIZE) % GRID_SIZE), RESOLUTION * ((i / GRID_SIZE) % GRID_SIZE), RESOLUTION * (i % GRID_SIZE));
         }
     }
 
@@ -157,6 +155,8 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
     
     current_angle = create_angle_of_rotation(0, 0, 0);
 
+    /************ STARTING MAIN DOCKING MECHANISM **************/
+
     // Generate all possible rotational angles
     while(current_angle.alpha < 360) {
         while(current_angle.beta < 360) {
@@ -190,6 +190,7 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
                     real = protein_space_matrix_transform[i][REAL];
                     im = protein_space_matrix_transform[i][IM];
 
+                    // C = P* . D where P* is the complex conjugate of the protein space matrix transform
                     protein_space_matrix_transform[i][REAL] = real * dna_space_matrix_transform[i][REAL] + im * dna_space_matrix_transform[i][IM];
                     protein_space_matrix_transform[i][IM] = real * dna_space_matrix_transform[i][IM] - im * dna_space_matrix_transform[i][REAL];
                 }
@@ -199,7 +200,7 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
                 fftw_execute(ifft_plan);
 
                 // Need to extract highest correlation translations and store in Result stack
-                insert_favourable_decoy_in_result_stack(result_stack, geometric_correlation_function, current_angle, protein->center);
+                insert_favourable_decoy_in_result_stack(result_stack, geometric_correlation_function, current_angle);
                 
                 
                 current_angle.gamma += ROTATION_STEP;
@@ -208,7 +209,6 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
         }
         current_angle.alpha += ROTATION_STEP;
     }
-
 
     /********** All iterations completed. Result Stack stores best geometric complementarity scores achieved ********/
 
@@ -224,4 +224,27 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
     return 1;
 }
 
-    
+int write_result_to_file(const char* filename, Result* result_stack){
+    // Defining local variables
+    int i; 
+    FILE* fptr;
+
+    // Open output file and handle errors
+    fptr = fopen(filename, "w");
+    if(fptr == NULL) {
+        FILE_ERROR;
+        printf("Function: write_result_to_file | scoring.c | 232\n");
+        return 0;
+    }
+
+    // File to write to open, now writing results
+    fprintf(fptr, "NUMBER_OF_RESULTS %d\n", result_stack->number_of_results);
+
+    for(i = 0; i < result_stack->number_of_results; i++) {
+        fprintf(fptr, "%f %f %f %f %f %f %f\n", result_stack->decoys[i].dna_translation.x, result_stack->decoys[i].dna_translation.y, result_stack->decoys[i].dna_translation.z, (float)result_stack->decoys[i].dna_rotation.alpha, (float)result_stack->decoys[i].dna_rotation.beta, (float)result_stack->decoys[i].dna_rotation.gamma, result_stack->decoys[i].total_score);
+    }
+
+    // Data written, closing file pointer and return success flag
+    fclose(fptr);
+    return 1;
+}

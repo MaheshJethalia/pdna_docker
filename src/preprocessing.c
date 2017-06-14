@@ -81,7 +81,7 @@ int read_pdb_to_biomolecule(const char* filename, Biomolecule* m) {
     
     // Open file <filename> and handle file error
     if((fptr = fopen(filename, "r")) == NULL) {
-        flag = -1;
+        flag = 0;
         FILE_ERROR;
         printf("Function: read_pdb_to_biomolecule | preprocessing.c | 67\n");
 
