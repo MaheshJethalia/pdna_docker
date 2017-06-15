@@ -1,1 +1,62 @@
-# Initial text!
+\documentclass{article}
+
+\title{ Brief Overview , Formulations and Computational Requirements}
+\usepackage{amsmath}
+
+\begin{document}
+\maketitle
+\pagenumbering{gobble}
+
+\newpage
+\pagenumbering{arabic}
+
+\section{Formulations for scoring configurations:}
+
+Let $P$ and $D$ be the geometric space discretized matrices for the protein and DNA biomolecules. Let $P_{i,j,k}$ and $D_{i,j,k}$ represent the member of $P$ and $D$ at indices $i$, $j$ and $k$. Let the indices range $0$ to $N$. Then we define the matrices as follows:\linebreak
+\begin{align*}
+ P_{i,j,k} &= \begin{cases} \rho & \text{if it lies in protein core} \\ 1 &\text{if it lies on protein surface} \\ 0 & \text{otherwise} \end{cases} \\ \\
+ D_{i,j,k} &= \begin{cases} 1 & \text{if it lies in protein core or surface} \\ 0 & \text{otherwise} \end{cases}  
+\end{align*}\linebreak
+Let $C$ be the geometric correlation function defined as:
+\begin{align*}
+C_{l,m,n} = \sum_{i=1}^N \sum_{j=1}^N \sum_{k=1}^N P_{i,j,k} \cdot D_{i+l,j+m,k+n}
+\end{align*}\linebreak
+This sumis calculated by taking the fourier transforms of $P$ and $D$ now stored as $\overline{P}$ and $\overline{D}$ and the transformed correlation function is defined as:
+\begin{align*}
+\overline{C}_{l,m,n} = \overline{P}_{l,m,n}^* \cdot \overline{D}_{l,m,n} 
+\end{align*}\linebreak
+We then obtain the original correlation function by taking the inverse fourier transform of $\overline{C}$.
+
+\newpage
+\section{Overview of the Code}
+The individual files of the code base with their time and memory complexity are as follows:
+\subsection{config.h}
+Header file that stores the necessary configurations for the docking algorithm such as the size of grid, the resolution of grid step, steps of angular rotation, etc.
+\subsection{docker.h}
+Header file that contains all the structure declarations and extern function declarations to be used for the algorithm.
+\subsection{preprocessing.c}
+Contains the following function declarations:
+\begin{itemize}
+\item generate\textunderscore trig\textunderscore tables(): Creates the sin and cos tables used further while creating configurations by rotation of the DNA biomolecule along the x, y and z axis. Time complexity = $O(360\backslash R)$ wherer R is the rotation step defined in config.h
+\item rotate\textunderscore coordinate(): Rotate the coordinate passed to it as parameter along the three axes w.r.t. the center coordinate passed as a parameter. Time complexity = $O(1)$
+\item read\textunderscore pdb\textunderscore to\textunderscore biomolecule(): Reads the processed pdb data of the biomolecule and allocates and initializes the data into an object of type Biomolecule. Time complexity = $O(A)$ where $A$ is the number of atoms in the pdb structure
+\item filter\textunderscore coordinates\textunderscore of\textunderscore biomolecule() \& center\textunderscore coordinates\textunderscore of\textunderscore biomolecule(): Performs necessary transformations on the coordinates of the biomolecules to translate the structure to the first quadrant (all coordinates positive) and center it with respect to the paramters of the geometric matrix grid. Time complexity = $O(A)$ for both, where $A$ is the number of atoms in the pdb structure.
+\end{itemize}
+\subsection{docker.c}
+Contains the following function declarations:
+\begin{itemize}
+\item get\textunderscore biomolecule\textunderscore diameter(): obtains approximately the largest diameter of the biomolecule, used for testing constraints in the configurables. Time complexity = $O(A)$, where $A$ is the number of atoms in the pdb structure
+\item check\textunderscore constraints(): Checks if the configurations satisfy the necessary constraints.Time complexity = $O(A)$, where $A$ is the number of atoms in the pdb structure
+\item create\textunderscore configuration(): Creates a geometric configuration of the structure by rotating it by a given angle. Time complexity = $O(A)$, where $A$ is the number of atoms in the pdb structure
+\item create\textunderscore geometric\textunderscore core(): Creates the space discretized matrix for the configuration wihtout the surface elements. Time complexity = $O(N^3)$ where N is the set value of grid size in config.h
+\item create\textunderscore geometric\textunderscore surface(): Create the geometric surface elements for the given space discretized matrix. Time complexity = $O(N^3)$ where N is the set value of grid size in config.h
+\end{itemize}
+\subsection{scoring.c}
+Contains the following function declarations:
+\begin{itemize}
+\item insert\textunderscore favourable\textunderscore decoy\textunderscore in\textunderscore result\textunderscore stack(): stores the peak translation and rotations coordinates from the correlation function matrix in the result stack. Time complexity = $O(N^3)$ where N is the set value of grid size in config.h
+\item dock\textunderscore biomolecules(): function that ultimately docks the two biomolecules passed to it as paramters. Time complexity =$O(N^3\log_2 N^3)$ where N is the set value of grid size in config.h
+\end{itemize}
+\subsection{main.c}
+Contains the main function that invokes all the other functions and performs the dokcing algorithm. Time complexity =$O(N^3\log_2 N^3)$ where N is the set value of grid size in config.h
+\end{document}
