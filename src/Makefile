@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -g -Wall
 
 # linker flags for Unix systems (for math.h and fftw3.h)
-LINKERFLAGS = -lm -fftw3
+LINKERFLAGS = -lm -lfftw3
 
 # header files
 HEADERS = config.h docker.h
@@ -16,7 +16,7 @@ RM = rm
 all: main
 
 main: main.o preprocessing.o docker.o scoring.o
-	$(CC) $(CFLAGS) preprocessing.c docker.c scoring.c main.c -o main
+	$(CC) $(CFLAGS) preprocessing.c docker.c scoring.c main.c -o main $(LINKERFLAGS)
 
 main.o: main.c $(HEADERS)
 	$(CC) $(CFLAGS) -c main.c -o main.o
@@ -31,4 +31,4 @@ scoring.o: scoring.c $(HEADERS)
 	$(CC) $(CFLAGS) -c scoring.c -o scoring.o
 
 clean:
-	$(RM) main *.o *~
+	$(RM) main *.o 

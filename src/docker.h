@@ -9,8 +9,8 @@
 #include <time.h>
 #include "config.h"
 
-extern float *sin_table ;
-extern float *cos_table ;
+extern float* sin_table ;
+extern float* cos_table ;
 
 typedef enum AtomType { NDEF, C, N} AtomType;
 

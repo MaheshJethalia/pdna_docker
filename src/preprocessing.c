@@ -1,9 +1,10 @@
 #include "docker.h"
 
+float* sin_table = NULL;
+float* cos_table = NULL;
+
 int generate_trig_tables(){
     int flag = 1;
-    float* sin_table; float* cos_table;     // extern defined pointers
-    sin_table = cos_table = NULL;
 
     // Allocate memory to sin_table and cos_table and handle error
     if(((sin_table = (float*)malloc(sizeof(float) * 360 / ROTATION_STEP)) != NULL) && ((cos_table = (float*)malloc(sizeof(float) * 360 / ROTATION_STEP)) != NULL)) {
