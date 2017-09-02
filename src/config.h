@@ -6,10 +6,10 @@
 // Sets the appropriate size of the grid for geometric scoring
 #define GRID_SIZE 200
 
-// Sets the steps in rotation around each axis of the DNA molecule
+// Sets the steps(degrees) in rotation around each axis of the DNA molecule
 #define ROTATION_STEP 10
 
-// Sets the distance covered per unit index of the space discretized matrix for geometric scoring
+// Sets the distance covered per unit index (in angstrom) of the space discretized matrix for geometric scoring
 // NOTE: it is necessary that diameter(biomolecule) < GRID_SIZE * RESOLUTION else contraints aren't satisfied
 #define RESOLUTION 1
 

@@ -1,28 +1,31 @@
 #include "docker.h"
 
-void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle ) {
+Decoy insert_favourable_decoy_in_result_stack(double* geometric_correlation_function, AngleOfRotation current_angle) {
     // Assumes that all memory allocations have already been taken care of
-    
-    // Local variable declarations
-    int i; Decoy d;
-    d.dna_rotation = current_angle;
-    i = 0;
+    Decoy d; 
 
-    // Initialize d with data of geometric_correlation_function[0]
-    d.dna_translation = create_coordinate(0.0, 0.0, 0.0);
-    d.total_score = geometric_correlation_function[0];
+    // Local variable declarations
+    int i; 
+    i = 0;
+    d.dna_translation = create_coordinate(0,0,0);
+    d.geometric_score = geometric_correlation_function[0];
+    d.refinement_score = 0.0;
+    d.dna_rotation = current_angle;
 
     // Search for sharpest peak value
     for(i = 1; i < GRID_SIZE * GRID_SIZE * GRID_SIZE; i++ ) {
-        if(geometric_correlation_function[i] > d.total_score) {
-            d.total_score = geometric_correlation_function[i];
+        if(geometric_correlation_function[i] > d.geometric_score) {
+            d.geometric_score = geometric_correlation_function[i];
             d.dna_translation = create_coordinate(RESOLUTION * (((i / GRID_SIZE) / GRID_SIZE) % GRID_SIZE), RESOLUTION * ((i / GRID_SIZE) % GRID_SIZE), RESOLUTION * (i % GRID_SIZE));
         }
     }
 
-    // d stores details of sharpest peak | Insert peak in result stack
-    result_stack->decoys[result_stack->number_of_results] = d;
-    result_stack->number_of_results += 1;
+    // returns the decoy details where peak exists
+    return d;
+}
+
+void set_refinement_score(Configuration* protein, Configuration* dna, Decoy d) {
+
 }
  
 int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
@@ -199,10 +202,13 @@ int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack){
                 // Now ready to perform inverse transform
                 fftw_execute(ifft_plan);
 
-                // Need to extract highest correlation translations and store in Result stack
-                insert_favourable_decoy_in_result_stack(result_stack, geometric_correlation_function, current_angle);
-                
-                
+                // Need to extract highest correlation translations and store in Result stack after finding the electrostatic and vdw score
+                Decoy d = insert_favourable_decoy_in_result_stack(geometric_correlation_function, current_angle);
+                set_refinement_score(protein, dna, d);
+                result_stack->decoys[result_stack->number_of_results] = d;
+                result_stack->number_of_results += 1;
+
+                // next iteration of the same                
                 current_angle.gamma += ROTATION_STEP;
             }
             current_angle.beta += ROTATION_STEP;
@@ -241,7 +247,7 @@ int write_result_to_file(const char* filename, Result* result_stack){
     fprintf(fptr, "NUMBER_OF_RESULTS %d\n", result_stack->number_of_results);
 
     for(i = 0; i < result_stack->number_of_results; i++) {
-        fprintf(fptr, "%f %f %f %f %f %f %f\n", result_stack->decoys[i].dna_translation.x, result_stack->decoys[i].dna_translation.y, result_stack->decoys[i].dna_translation.z, (float)result_stack->decoys[i].dna_rotation.alpha, (float)result_stack->decoys[i].dna_rotation.beta, (float)result_stack->decoys[i].dna_rotation.gamma, result_stack->decoys[i].total_score);
+        fprintf(fptr, "%f %f %f %f %f %f %f %f\n", result_stack->decoys[i].dna_translation.x, result_stack->decoys[i].dna_translation.y, result_stack->decoys[i].dna_translation.z, (float)result_stack->decoys[i].dna_rotation.alpha, (float)result_stack->decoys[i].dna_rotation.beta, (float)result_stack->decoys[i].dna_rotation.gamma, result_stack->decoys[i].geometric_score, result_stack->decoys[i].refinement_score);
     }
 
     // Data written, closing file pointer and return success flag

@@ -9,9 +9,11 @@
 #include <time.h>
 #include "config.h"
 
+// Stores the table of precalculated sine and cosine values to boost computational speed
 extern float* sin_table ;
 extern float* cos_table ;
 
+// Enum to store atom types
 typedef enum AtomType { NDEF, C, N} AtomType;
 
 typedef struct Coordinate {
@@ -51,7 +53,8 @@ typedef struct Matrix {
 typedef struct Decoy {
     Coordinate dna_translation;
     AngleOfRotation dna_rotation;
-    float total_score;
+    float geometric_score;
+    float refinement_score;
 } Decoy;
 
 typedef struct Result {
@@ -89,7 +92,10 @@ extern void create_geometric_surface(Matrix* matrix);
 
 extern int dock_biomolecules(Biomolecule* P, Biomolecule* D, Result* result_stack);
 
-extern void insert_favourable_decoy_in_result_stack(Result* result_stack, double* geometric_correlation_function, AngleOfRotation current_angle);
+extern Decoy insert_favourable_decoy_in_result_stack(double* geometric_correlation_function, AngleOfRotation current_angle);
 
 extern int write_result_to_file(const char* filename, Result* result_stack);
+
+extern void set_refinement_score(Configuration* protein, Configuration* dna, Decoy d);
+
 #endif
