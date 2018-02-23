@@ -1,8 +1,5 @@
-MOVED TO : https://github.com/blooops/pro_dna_docker
 
-
-
-A simple protein-DNA docker currently under construction
+A simple protein-DNA docker for testing out geometric complementarity, written in C.
 
 Rohit Roy, IIT Kharagpur
 
